@@ -13,10 +13,12 @@ public class PlayerController : MonoBehaviour
     private Rigidbody mRb;
     private Vector2 mDirection;
     private Vector2 mDeltaLook;
+    private Transform cameraMain;
 
     private void Start()
     {
         mRb = GetComponent<Rigidbody>();
+        cameraMain = transform.Find("Main Camera");
     }
 
     private void Update()
@@ -32,6 +34,9 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(
             Vector3.up,
             turnSpeed * Time.deltaTime * mDeltaLook.x
+        );
+        cameraMain.GetComponent<CameraMovement>().RotateUpDown(
+            -turnSpeed * Time.deltaTime * mDeltaLook.y
         );
 
     }
