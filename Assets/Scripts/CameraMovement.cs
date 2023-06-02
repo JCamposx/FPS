@@ -8,27 +8,13 @@ public class CameraMovement : MonoBehaviour
     
     public void RotateUpDown(float angle)
     {
-        //Vector3 rotationPre = transform.rotation.eulerAngles;
-
-        transform.Rotate(
-            Vector3.right,
-            angle
+        Vector3 newRotation = new Vector3(
+            transform.rotation.eulerAngles.x + angle,
+            transform.rotation.eulerAngles.y,
+            transform.rotation.eulerAngles.z
         );
 
-        /*rotationPre.x = Mathf.Clamp(
-            transform.rotation.eulerAngles.x,
-            -90f,
-            90f
-        );
-
-        transform.rotation = Quaternion.Euler(rotationPre);*/
-
-        /*if (transform.rotation.eulerAngles.x > 80f &&
-            transform.rotation.eulerAngles.x < 280f )
-        {
-            Debug.Log("cp1");
-            transform.rotation = Quaternion.Euler(rotationPre);
-        }*/
+        transform.rotation = Quaternion.Euler(newRotation);
 
         rotation = transform.rotation.eulerAngles;
     }
