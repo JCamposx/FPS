@@ -6,11 +6,16 @@ public class EnemyController : MonoBehaviour
 {
     public float Speed = 2f;
     public float AwakeRadio = 2f;
+    public float AttackRadio = .5f;
+
 
     private Animator mAnimator;
     private Rigidbody mRb;
 
     private Vector2 mDirection; // XZ
+
+    private bool mIsAttacking = false;
+
 
     private void Start()
     {
@@ -21,10 +26,21 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+        var collider = IsPlayerInAttackArea();
+        if (collider != null && !mIsAttacking)
+        {
+            mRb.velocity = new Vector3(
+                0f,
+                0f,
+                0f
+            );
+            mAnimator.SetBool("IsWalking", false);
+            mAnimator.SetTrigger("Attack");
+            return;
+        }
 
-
-        var collider = IsPlayerNearby();
-        if (collider != null)
+        collider = IsPlayerNearby();
+        if (collider != null && !mIsAttacking)
         {
             // caminar
             var playerPosition = collider.transform.position;
@@ -66,5 +82,26 @@ public class EnemyController : MonoBehaviour
         );
         if (colliders.Length == 1) return colliders[0];
         else return null;
+    }
+
+    private Collider IsPlayerInAttackArea()
+    {
+        var colliders = Physics.OverlapSphere(
+            transform.position,
+            AttackRadio,
+            LayerMask.GetMask("Player")
+        );
+        if (colliders.Length == 1) return colliders[0];
+        else return null;
+    }
+
+    public void StartAtack()
+    {
+        mIsAttacking = true;
+    }
+
+    public void StopAttack()
+    {
+        mIsAttacking = false;
     }
 }
