@@ -7,6 +7,9 @@ public class EnemyController : MonoBehaviour
     public float Speed = 2f;
     public float AwakeRadio = 2f;
     public float AttackRadio = .5f;
+    public float Health = 5f;
+    public GameObject hitboxRight;
+    public GameObject hitboxLeft;
 
 
     private Animator mAnimator;
@@ -26,8 +29,8 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        var collider = IsPlayerInAttackArea();
-        if (collider != null && !mIsAttacking)
+        var collider1 = IsPlayerInAttackArea();
+        if (collider1 != null && !mIsAttacking)
         {
             mRb.velocity = new Vector3(
                 0f,
@@ -39,11 +42,11 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        collider = IsPlayerNearby();
-        if (collider != null && !mIsAttacking)
+        var collider2 = IsPlayerNearby();
+        if (collider2 != null && !mIsAttacking)
         {
             // caminar
-            var playerPosition = collider.transform.position;
+            var playerPosition = collider2.transform.position;
             var direction = playerPosition - transform.position;
             mDirection = new Vector2(direction.x, direction.z);
 
@@ -91,6 +94,7 @@ public class EnemyController : MonoBehaviour
             AttackRadio,
             LayerMask.GetMask("Player")
         );
+        
         if (colliders.Length == 1) return colliders[0];
         else return null;
     }
@@ -100,8 +104,25 @@ public class EnemyController : MonoBehaviour
         mIsAttacking = true;
     }
 
+    public void EnableHitbox()
+    {
+        hitboxLeft.SetActive(true);
+        hitboxRight.SetActive(true);
+    }
+
     public void StopAttack()
     {
         mIsAttacking = false;
+        hitboxLeft.SetActive(false);
+        hitboxRight.SetActive(false);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        Health -= damage;
+        if (Health <= 0f)
+        {
+            Destroy(gameObject);
+        }
     }
 }

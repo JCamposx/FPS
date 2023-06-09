@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     private float shootDistance = 4f;
     [SerializeField]
     private ParticleSystem shootPS;
+    [SerializeField]
+    private float health;
     
 
     private Rigidbody mRb;
@@ -80,13 +82,12 @@ public class PlayerController : MonoBehaviour
             shootDistance
         ))
         {
-            //var debugSphere = Instantiate(debugImpactSphere, hit.point, Quaternion.identity);
-            //Destroy(debugSphere, 3f);
-
             if (hit.collider.CompareTag("Enemigos"))
             {
                 var bloodPS = Instantiate(bloodObjectParticles, hit.point, Quaternion.identity);
                 Destroy(bloodPS, 3f);
+                var enemyController = hit.collider.GetComponent<EnemyController>();
+                enemyController.TakeDamage(1f);
             }else
             {
                 var otherPS = Instantiate(otherObjectParticles, hit.point, Quaternion.identity);
@@ -96,4 +97,25 @@ public class PlayerController : MonoBehaviour
             
         }
     }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        if (health <= 0f)
+        {
+            // Fin del juego
+            Debug.Log("Fin del juego");
+        }
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.CompareTag("Enemigo-Attack"))
+        {
+            Debug.Log("Player recibio danho");
+            TakeDamage(1f);
+        }
+        
+    }
+
 }

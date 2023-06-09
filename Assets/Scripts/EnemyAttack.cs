@@ -16,4 +16,9 @@ public class EnemyAttack : MonoBehaviour
     {
         controller.StopAttack();
     }
+
+    public void EnableHitbox()
+    {
+        controller.EnableHitbox();
+    }
 }

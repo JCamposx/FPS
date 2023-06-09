@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemigos
+  - Enemigo-Attack
   layers:
   - Default
   - TransparentFX
