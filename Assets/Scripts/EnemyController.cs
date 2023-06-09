@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class EnemyController : MonoBehaviour
 
     private Animator mAnimator;
     private Rigidbody mRb;
+    private NavMeshAgent navMeshAgent;
 
     private Vector2 mDirection; // XZ
 
@@ -25,6 +27,7 @@ public class EnemyController : MonoBehaviour
         mRb = GetComponent<Rigidbody>();
         mAnimator = transform
             .GetComponentInChildren<Animator>(false);
+        navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
     private void Update()
@@ -37,6 +40,7 @@ public class EnemyController : MonoBehaviour
                 0f,
                 0f
             );
+            navMeshAgent.isStopped = true;
             mAnimator.SetBool("IsWalking", false);
             mAnimator.SetTrigger("Attack");
             return;
@@ -45,35 +49,49 @@ public class EnemyController : MonoBehaviour
         var collider2 = IsPlayerNearby();
         if (collider2 != null && !mIsAttacking)
         {
-            // caminar
-            var playerPosition = collider2.transform.position;
-            var direction = playerPosition - transform.position;
-            mDirection = new Vector2(direction.x, direction.z);
-
-            //transform.LookAt(playerPosition, Vector3.up);
-            direction.y = 0f;
+            mAnimator.SetBool("IsWalking", true);
+            navMeshAgent.isStopped = false;
+            navMeshAgent.SetDestination(collider2.transform.position);
+            //Walk(collider2);
             
-            transform.rotation = Quaternion.Lerp(
-                transform.rotation, 
-                Quaternion.LookRotation(direction, Vector3.up), 
-                0.1f
-            );
-
-            mRb.velocity = new Vector3(
-                mDirection.x * Speed,
-                0f,
-                mDirection.y * Speed
-            );
-
-            mAnimator.SetBool("IsWalking",true);
-            mAnimator.SetFloat("Horizontal", mDirection.x);
-            mAnimator.SetFloat("Vertical", mDirection.y);
-        }else 
+            //mAnimator.SetFloat("Horizontal", mDirection.x);
+            //mAnimator.SetFloat("Vertical", mDirection.y);
+        }
+        else 
         {
             // parar
             mRb.velocity = Vector3.zero;
             mAnimator.SetBool("IsWalking",false);
+            navMeshAgent.isStopped = true;
+            navMeshAgent.ResetPath();
         }
+    }
+
+    private void Walk(Collider collider2)
+    {
+        // caminar
+        var playerPosition = collider2.transform.position;
+        var direction = playerPosition - transform.position;
+        mDirection = new Vector2(direction.x, direction.z);
+
+        //transform.LookAt(playerPosition, Vector3.up);
+        direction.y = 0f;
+
+        transform.rotation = Quaternion.Lerp(
+            transform.rotation,
+            Quaternion.LookRotation(direction, Vector3.up),
+            0.1f
+        );
+
+        mRb.velocity = new Vector3(
+            mDirection.x * Speed,
+            0f,
+            mDirection.y * Speed
+        );
+
+        mAnimator.SetBool("IsWalking", true);
+        mAnimator.SetFloat("Horizontal", mDirection.x);
+        mAnimator.SetFloat("Vertical", mDirection.y);
     }
 
     private Collider IsPlayerNearby()
