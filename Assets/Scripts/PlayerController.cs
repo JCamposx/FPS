@@ -13,9 +13,12 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 mDirection;
     private Vector2 mDeltaLook;
+    private bool isEquippedShotgun = true;
 
     private Rigidbody mRb;
     private Transform cameraMain;
+    private GameObject Shotgun;
+    private GameObject AssaultRiffle;
     private GameObject debugImpactSphere;
     private GameObject bloodObjectParticles;
     private GameObject otherObjectParticles;
@@ -25,12 +28,16 @@ public class PlayerController : MonoBehaviour
         mRb = GetComponent<Rigidbody>();
 
         cameraMain = transform.Find("Main Camera");
+        AssaultRiffle = cameraMain.GetChild(0).gameObject;
+        Shotgun = cameraMain.GetChild(1).gameObject;
 
         debugImpactSphere = Resources.Load<GameObject>("DebugImpactSphere");
         bloodObjectParticles = Resources.Load<GameObject>("BloodSplat_FX Variant");
         otherObjectParticles = Resources.Load<GameObject>("GunShot_Smoke_FX Variant");
 
         Cursor.lockState = CursorLockMode.Locked;
+        AssaultRiffle.SetActive(!isEquippedShotgun);
+        Shotgun.SetActive(isEquippedShotgun);
     }
 
     private void FixedUpdate()
@@ -63,6 +70,17 @@ public class PlayerController : MonoBehaviour
         if (value.isPressed)
         {
             Shoot();
+        }
+    }
+
+    private void OnChangeGun(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            isEquippedShotgun = !isEquippedShotgun;
+
+            AssaultRiffle.SetActive(!isEquippedShotgun);
+            Shotgun.SetActive(isEquippedShotgun);
         }
     }
 
