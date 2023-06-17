@@ -142,6 +142,28 @@ public class PlayerController : MonoBehaviour
 
     private void VerifyShootAssaultRifle()
     {
+        if (Mouse.current.rightButton.isPressed && !isEquippedShotgun)
+        {
+            AssaultRiffle.transform.localPosition = new Vector3(
+                0.001f,
+                -0.116f,
+                0.109f
+            );
+
+            GameManager.Instance.HideCrossHair();
+        }
+        else
+        {
+            AssaultRiffle.transform.localPosition = new Vector3(
+                0.209f,
+                -0.172f,
+                0.166f
+            );
+
+            GameManager.Instance.ShowCrossHair();
+        }
+
+
         if (Mouse.current.leftButton.isPressed && !isEquippedShotgun && isFiring)
         {
             accumulatedFireTime += Time.deltaTime;
