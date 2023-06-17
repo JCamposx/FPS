@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,12 +9,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float turnSpeed;
     [SerializeField] private float shootDistance = 4f;
-    [SerializeField] private ParticleSystem shootPS;
+    [SerializeField] private ParticleSystem shotgunPS;
+    [SerializeField] private ParticleSystem assaultRiflePS;
     [SerializeField] private float health;
 
     private Vector2 mDirection;
     private Vector2 mDeltaLook;
     private bool isEquippedShotgun = true;
+    private bool isFiring = false;
+    private float fireRate = 0.15f;
+    private float accumulatedFireTime = 0.15f;
+    private float fireDamage = 4f;
 
     private Rigidbody mRb;
     private Transform cameraMain;
@@ -21,7 +27,6 @@ public class PlayerController : MonoBehaviour
     private GameObject AssaultRiffle;
     private GameObject debugImpactSphere;
     private GameObject bloodObjectParticles;
-    private GameObject otherObjectParticles;
 
     private void Start()
     {
@@ -33,7 +38,6 @@ public class PlayerController : MonoBehaviour
 
         debugImpactSphere = Resources.Load<GameObject>("DebugImpactSphere");
         bloodObjectParticles = Resources.Load<GameObject>("BloodSplat_FX Variant");
-        otherObjectParticles = Resources.Load<GameObject>("GunShot_Smoke_FX Variant");
 
         Cursor.lockState = CursorLockMode.Locked;
         AssaultRiffle.SetActive(!isEquippedShotgun);
@@ -42,6 +46,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        VerifyShootAssaultRifle();
+
         mRb.velocity = mDirection.y * speed * transform.forward
             + mDirection.x * speed * transform.right;
 
@@ -69,7 +75,19 @@ public class PlayerController : MonoBehaviour
     {
         if (value.isPressed)
         {
-            Shoot();
+            if (isEquippedShotgun)
+            {
+                shootDistance = 4f;
+                fireDamage = 4f;
+
+                Shoot();
+            }
+            else
+            {
+                isFiring = true;
+                shootDistance = 20f;
+                fireDamage = 0.5f;
+            }
         }
     }
 
@@ -86,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()
     {
-        shootPS.Play();
+        (isEquippedShotgun ? shotgunPS : assaultRiflePS).Play();
 
         RaycastHit hit;
 
@@ -100,16 +118,44 @@ public class PlayerController : MonoBehaviour
             if (hit.collider.CompareTag("Enemigos"))
             {
                 var bloodPS = Instantiate(bloodObjectParticles, hit.point, Quaternion.identity);
+
                 Destroy(bloodPS, 3f);
+
                 var enemyController = hit.collider.GetComponent<EnemyController>();
-                enemyController.TakeDamage(1f);
+
+                enemyController.TakeDamage(fireDamage);
             }
             else
             {
-                var otherPS = Instantiate(otherObjectParticles, hit.point, Quaternion.identity);
+                var otherPS = Instantiate(
+                    (isEquippedShotgun ? shotgunPS : assaultRiflePS).gameObject,
+                    hit.point,
+                    Quaternion.identity
+                );
+
                 otherPS.GetComponent<ParticleSystem>().Play();
+
                 Destroy(otherPS, 3f);
             }
+        }
+    }
+
+    private void VerifyShootAssaultRifle()
+    {
+        if (Mouse.current.leftButton.isPressed && !isEquippedShotgun && isFiring)
+        {
+            accumulatedFireTime += Time.deltaTime;
+
+            if (accumulatedFireTime >= fireRate)
+            {
+                Shoot();
+                accumulatedFireTime = 0f;
+            }
+        }
+        else
+        {
+            isFiring = false;
+            accumulatedFireTime = fireRate;
         }
     }
 
