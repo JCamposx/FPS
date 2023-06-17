@@ -5,21 +5,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private float speed;
-    [SerializeField]
-    private float turnSpeed;
-    [SerializeField]
-    private float shootDistance = 4f;
-    [SerializeField]
-    private ParticleSystem shootPS;
-    [SerializeField]
-    private float health;
-    
+    [SerializeField] private float speed;
+    [SerializeField] private float turnSpeed;
+    [SerializeField] private float shootDistance = 4f;
+    [SerializeField] private ParticleSystem shootPS;
+    [SerializeField] private float health;
 
-    private Rigidbody mRb;
     private Vector2 mDirection;
     private Vector2 mDeltaLook;
+
+    private Rigidbody mRb;
     private Transform cameraMain;
     private GameObject debugImpactSphere;
     private GameObject bloodObjectParticles;
@@ -28,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         mRb = GetComponent<Rigidbody>();
+
         cameraMain = transform.Find("Main Camera");
 
         debugImpactSphere = Resources.Load<GameObject>("DebugImpactSphere");
@@ -39,17 +35,17 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        mRb.velocity = mDirection.y * speed * transform.forward 
+        mRb.velocity = mDirection.y * speed * transform.forward
             + mDirection.x * speed * transform.right;
 
         transform.Rotate(
             Vector3.up,
             turnSpeed * Time.deltaTime * mDeltaLook.x
         );
+
         cameraMain.GetComponent<CameraMovement>().RotateUpDown(
             -turnSpeed * Time.deltaTime * mDeltaLook.y
         );
-
     }
 
     private void OnMove(InputValue value)
@@ -75,6 +71,7 @@ public class PlayerController : MonoBehaviour
         shootPS.Play();
 
         RaycastHit hit;
+
         if (Physics.Raycast(
             cameraMain.position,
             cameraMain.forward,
@@ -88,19 +85,20 @@ public class PlayerController : MonoBehaviour
                 Destroy(bloodPS, 3f);
                 var enemyController = hit.collider.GetComponent<EnemyController>();
                 enemyController.TakeDamage(1f);
-            }else
+            }
+            else
             {
                 var otherPS = Instantiate(otherObjectParticles, hit.point, Quaternion.identity);
                 otherPS.GetComponent<ParticleSystem>().Play();
                 Destroy(otherPS, 3f);
             }
-            
         }
     }
 
     public void TakeDamage(float damage)
     {
         health -= damage;
+
         if (health <= 0f)
         {
             // Fin del juego
@@ -115,7 +113,5 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Player recibio danho");
             TakeDamage(1f);
         }
-        
     }
-
 }

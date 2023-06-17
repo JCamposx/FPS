@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class EnemyAttack : MonoBehaviour
 {
-    [SerializeField]
-    private EnemyController controller;
+    [SerializeField] private EnemyController controller;
 
     public void StartAtack()
     {

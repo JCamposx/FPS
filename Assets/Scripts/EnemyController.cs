@@ -9,30 +9,27 @@ public class EnemyController : MonoBehaviour
     public float AwakeRadio = 2f;
     public float AttackRadio = .5f;
     public float Health = 5f;
+    private bool mIsAttacking = false;
+    private Vector2 mDirection; // XZ
+
     public GameObject hitboxRight;
     public GameObject hitboxLeft;
-
-
     private Animator mAnimator;
     private Rigidbody mRb;
     private NavMeshAgent navMeshAgent;
 
-    private Vector2 mDirection; // XZ
-
-    private bool mIsAttacking = false;
-
-
     private void Start()
     {
         mRb = GetComponent<Rigidbody>();
-        mAnimator = transform
-            .GetComponentInChildren<Animator>(false);
         navMeshAgent = GetComponent<NavMeshAgent>();
+
+        mAnimator = transform.GetComponentInChildren<Animator>(false);
     }
 
     private void Update()
     {
         var collider1 = IsPlayerInAttackArea();
+
         if (collider1 != null && !mIsAttacking)
         {
             mRb.velocity = new Vector3(
@@ -47,21 +44,22 @@ public class EnemyController : MonoBehaviour
         }
 
         var collider2 = IsPlayerNearby();
+
         if (collider2 != null && !mIsAttacking)
         {
             mAnimator.SetBool("IsWalking", true);
             navMeshAgent.isStopped = false;
             navMeshAgent.SetDestination(collider2.transform.position);
+
             //Walk(collider2);
-            
             //mAnimator.SetFloat("Horizontal", mDirection.x);
             //mAnimator.SetFloat("Vertical", mDirection.y);
         }
-        else 
+        else
         {
             // parar
             mRb.velocity = Vector3.zero;
-            mAnimator.SetBool("IsWalking",false);
+            mAnimator.SetBool("IsWalking", false);
             navMeshAgent.isStopped = true;
             navMeshAgent.ResetPath();
         }
@@ -101,6 +99,7 @@ public class EnemyController : MonoBehaviour
             AwakeRadio,
             LayerMask.GetMask("Player")
         );
+
         if (colliders.Length == 1) return colliders[0];
         else return null;
     }
@@ -112,7 +111,7 @@ public class EnemyController : MonoBehaviour
             AttackRadio,
             LayerMask.GetMask("Player")
         );
-        
+
         if (colliders.Length == 1) return colliders[0];
         else return null;
     }
@@ -138,6 +137,7 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(float damage)
     {
         Health -= damage;
+
         if (Health <= 0f)
         {
             Destroy(gameObject);
