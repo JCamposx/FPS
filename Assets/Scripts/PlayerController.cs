@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,7 +13,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float shootDistance = 4f;
     [SerializeField] private ParticleSystem shotgunPS;
     [SerializeField] private ParticleSystem assaultRiflePS;
-    [SerializeField] private float health;
+    [SerializeField] private Image canvasHealthImage;
+    [SerializeField] private Slider healthBar;
+    [SerializeField] private Sprite[] healthImages1;
+    [SerializeField] private Sprite[] healthImages2;
+    [SerializeField] private Sprite[] healthImages3;
+    [SerializeField] private Sprite[] healthImages4;
 
     private Vector2 mDirection;
     private Vector2 mDeltaLook;
@@ -20,6 +27,11 @@ public class PlayerController : MonoBehaviour
     private float fireRate = 0.15f;
     private float accumulatedFireTime = 0.15f;
     private float fireDamage = 4f;
+    private Sprite[] healthImagesCopy;
+    private float health = 30f;
+    private bool isReceivingDamage = false;
+    private float receiveDamageTime = 0f;
+    private bool hadReceivedDamage = false;
 
     private Rigidbody mRb;
     private Transform cameraMain;
@@ -42,11 +54,20 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         AssaultRiffle.SetActive(!isEquippedShotgun);
         Shotgun.SetActive(isEquippedShotgun);
+
+        healthImagesCopy = healthImages1;
+        canvasHealthImage.sprite = healthImagesCopy[0];
+        healthBar.maxValue = health;
+        healthBar.value = health;
     }
 
     private void FixedUpdate()
     {
         VerifyShootAssaultRifle();
+
+        ChangeCanvasHealthImage();
+
+        VerifyIsReceivingDamage();
 
         mRb.velocity = mDirection.y * speed * transform.forward
             + mDirection.x * speed * transform.right;
@@ -183,7 +204,30 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        isReceivingDamage = true;
+
         health -= damage;
+        healthBar.value = health;
+
+        if (health <= healthBar.maxValue * 0.25f)
+        {
+            hadReceivedDamage = true;
+            healthImagesCopy = healthImages4;
+        }
+        else if (health <= healthBar.maxValue * 0.5f)
+        {
+            hadReceivedDamage = true;
+            healthImagesCopy = healthImages3;
+        }
+        else if (health <= healthBar.maxValue * 0.75f)
+        {
+            hadReceivedDamage = true;
+            healthImagesCopy = healthImages2;
+        }
+        else
+        {
+            healthImagesCopy = healthImages1;
+        }
 
         if (health <= 0f)
         {
@@ -191,6 +235,44 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Fin del juego");
         }
     }
+
+    private void ChangeCanvasHealthImage()
+    {
+        Debug.Log(health);
+
+        if (health <= 0f)
+        {
+            canvasHealthImage.sprite = healthImagesCopy[2];
+            return;
+        }
+
+        if (isReceivingDamage)
+        {
+            canvasHealthImage.sprite = healthImagesCopy[2];
+            return;
+        }
+
+        if (hadReceivedDamage)
+        {
+            canvasHealthImage.sprite = healthImagesCopy[4];
+            return;
+        }
+
+        canvasHealthImage.sprite = healthImagesCopy[0];
+    }
+
+    private void VerifyIsReceivingDamage()
+    {
+        if (!isReceivingDamage) return;
+
+        receiveDamageTime += Time.deltaTime;
+
+        if (receiveDamageTime < 1f) return;
+
+        isReceivingDamage = false;
+        receiveDamageTime = 0f;
+    }
+
 
     private void OnTriggerEnter(Collider col)
     {
