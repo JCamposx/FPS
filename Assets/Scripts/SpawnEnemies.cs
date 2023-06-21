@@ -8,8 +8,9 @@ public class SpawnEnemies : MonoBehaviour
     [SerializeField] private Transform player;
 
     private System.Random random;
-    private int minEnemies = 10;
-    private int maxEnemies = 15;
+    private int minEnemies = 15;
+    private int maxEnemies = 20;
+    private float spawnRadius = 3f;
     private float spawnTime = 60f;
     private float elapsedTime = 0f;
 
@@ -42,14 +43,21 @@ public class SpawnEnemies : MonoBehaviour
     {
         int enemiesQuantity = random.Next(minEnemies, maxEnemies + 1);
 
+        float angleIncrement = 360f / enemiesQuantity;
+
         for (int i = 0; i < enemiesQuantity; i++)
         {
+            float angle = i * angleIncrement;
+
+            float spawnX = player.position.x + spawnRadius * Mathf.Cos(Mathf.Deg2Rad * angle);
+            float spawnZ = player.position.z + spawnRadius * Mathf.Sin(Mathf.Deg2Rad * angle);
+
             GameObject prefabInstace = Instantiate(
                 enemy,
                 new Vector3(
-                    player.position.x,
+                    spawnX,
                     player.position.y + 2f,
-                    player.position.z + 2f
+                    spawnZ
                 ),
                 Quaternion.identity
             );
