@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 mDeltaLook;
     private bool isEquippedShotgun = true;
     private bool isFiring = false;
-    private float fireRate = 0.15f;
+    private float fireRate = 0.125f;
     private float accumulatedFireTime = 0.15f;
     private float fireDamage = 4f;
     private Sprite[] healthImagesCopy;
@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
             if (isEquippedShotgun)
             {
                 shootDistance = 4f;
-                fireDamage = 4f;
+                fireDamage = 5f;
 
                 Shoot();
             }
@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
             {
                 isFiring = true;
                 shootDistance = 20f;
-                fireDamage = 0.5f;
+                fireDamage = 2.5f;
             }
         }
     }
