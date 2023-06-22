@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     private float accumulatedFireTime = 0.15f;
     private float fireDamage = 4f;
     private Sprite[] healthImagesCopy;
-    private float health = 30f;
+    public float health = 30f;
     private bool isReceivingDamage = false;
     private float receiveDamageTime = 0f;
     private bool hadReceivedDamage = false;
@@ -63,11 +63,20 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (health <= 0f) {
+            AssaultRiffle.SetActive(false);
+            Shotgun.SetActive(false);
+            VerifyRestartMatch();
+            return;
+        }
+
         VerifyShootAssaultRifle();
 
         ChangeCanvasHealthImage();
 
         VerifyIsReceivingDamage();
+
+        VerifyRestartMatch();
 
         mRb.velocity = mDirection.y * speed * transform.forward
             + mDirection.x * speed * transform.right;
@@ -94,6 +103,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnFire(InputValue value)
     {
+        if (health <= 0f) return;
+
         if (value.isPressed)
         {
             if (isEquippedShotgun)
@@ -114,6 +125,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnChangeGun(InputValue value)
     {
+        if (health <= 0f) return;
+
         if (value.isPressed)
         {
             isEquippedShotgun = !isEquippedShotgun;
@@ -228,18 +241,10 @@ public class PlayerController : MonoBehaviour
         {
             healthImagesCopy = healthImages1;
         }
-
-        if (health <= 0f)
-        {
-            // Fin del juego
-            Debug.Log("Fin del juego");
-        }
     }
 
     private void ChangeCanvasHealthImage()
     {
-        Debug.Log(health);
-
         if (health <= 0f)
         {
             canvasHealthImage.sprite = healthImagesCopy[2];
@@ -273,6 +278,13 @@ public class PlayerController : MonoBehaviour
         receiveDamageTime = 0f;
     }
 
+    private void VerifyRestartMatch()
+    {
+        if (health <= 0f)
+        {
+            GameManager.Instance.ManageRestartMatch();
+        }
+    }
 
     private void OnTriggerEnter(Collider col)
     {

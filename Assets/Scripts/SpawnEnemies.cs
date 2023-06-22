@@ -23,6 +23,8 @@ public class SpawnEnemies : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (player.GetComponent<PlayerController>().health <= 0f) return;
+
         VerifySpawn();
     }
 
