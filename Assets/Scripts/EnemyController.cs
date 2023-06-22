@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class EnemyController : MonoBehaviour
 {
     public float Speed = 2f;
-    public float AwakeRadio = 2f;
+    public float AwakeRadio = 20f;
     public float AttackRadio = .5f;
     public float Health = 10f;
     private bool mIsAttacking = false;

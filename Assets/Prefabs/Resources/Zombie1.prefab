@@ -267,7 +267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 1
-  AwakeRadio: 2
+  AwakeRadio: 20
   AttackRadio: 0.5
   Health: 10
   hitboxRight: {fileID: 8710474769397737165}
