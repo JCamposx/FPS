@@ -12,7 +12,7 @@ public class SpawnEnemies : MonoBehaviour
 
     private System.Random random;
     private float spawnRadius = 3f;
-    private float spawnTime = 15f;
+    private float spawnTime = 60f;
     private float elapsedTime = 0f;
 
     private void Start()
