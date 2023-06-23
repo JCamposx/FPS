@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,12 +7,12 @@ public class SpawnEnemies : MonoBehaviour
 {
     [SerializeField] private GameObject enemy;
     [SerializeField] private Transform player;
+    [SerializeField] private int minEnemies = 15;
+    [SerializeField] private int maxEnemies = 20;
 
     private System.Random random;
-    private int minEnemies = 15;
-    private int maxEnemies = 20;
     private float spawnRadius = 3f;
-    private float spawnTime = 60f;
+    private float spawnTime = 15f;
     private float elapsedTime = 0f;
 
     private void Start()
@@ -21,11 +22,29 @@ public class SpawnEnemies : MonoBehaviour
         Spawn();
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (player.GetComponent<PlayerController>().health <= 0f) return;
+        if (player.GetComponent<PlayerController>().health <= 0f) {
+            GameManager.Instance.timer.gameObject.SetActive(false);
+            return;
+        }
+
+        UpdateTimer();
 
         VerifySpawn();
+    }
+
+    private void UpdateTimer()
+    {
+        if (Input.GetKeyDown(KeyCode.E)) elapsedTime = spawnTime - 5;
+
+        GameManager.Instance.timer.text = $"{Mathf.RoundToInt(spawnTime - elapsedTime)}";
+
+        var timerColor = Color.white;
+
+        if (spawnTime - elapsedTime <= 10.49f) timerColor = Color.red;
+
+        GameManager.Instance.timer.color = timerColor;
     }
 
     private void VerifySpawn()

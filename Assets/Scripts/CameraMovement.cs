@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
-    public float MaxRot = 20f;
-    public float MinRot = -20f;
+    public float MaxRot = 70f;
+    public float MinRot = -70f;
 
     public void RotateUpDown(float angle)
     {
